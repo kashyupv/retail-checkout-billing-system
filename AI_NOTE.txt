@@ -1,0 +1,13 @@
+AI Tool Used:
+ChatGPT
+
+Purpose:
+ChatGPT was used to assist with project planning, billing logic implementation, validation rules, user interface improvements, and documentation.
+
+Challenges:
+- Designing a retail-style checkout workflow
+- Implementing dynamic product management
+- Performing billing calculations and GST computation
+- Creating a clean and user-friendly interface
+
+All generated suggestions were reviewed, tested, and modified before final submission.
