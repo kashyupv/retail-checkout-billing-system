@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retail Checkout Billing System</title>
+    <!-- Tailwind CSS CDN for modern utility classes -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 font-sans antialiased">
+
+    <div class="max-w-6xl mx-auto px-4 py-8">
+        <!-- System Header -->
+        <header class="mb-8 flex flex-col sm:flex-row items-center justify-between border-b pb-5 border-slate-200 gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="p-3 bg-indigo-600 text-white rounded-xl shadow-md text-2xl">
+                    🛒
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold tracking-tight text-slate-900">SmartCheckout System</h1>
+                    <p class="text-sm text-slate-500">Albertsons India Technical Case Study Prototype</p>
+                </div>
+            </div>
+            <button id="resetBtn" class="flex items-center space-x-1 text-sm bg-white border border-slate-300 rounded-lg px-4 py-2 text-red-600 hover:bg-red-50 font-medium transition cursor-pointer">
+                <span>🔄 Reset System</span>
+            </button>
+        </header>
+
+        <!-- Dynamic Promotion Banner -->
+        <div class="mb-8 bg-emerald-50 border border-emerald-200 text-emerald-900 p-4 rounded-xl flex items-center justify-between shadow-sm">
+            <div class="flex items-center space-x-3">
+                <span class="text-2xl">🎉</span>
+                <div>
+                    <span class="font-bold block">Special Store Offer Active</span>
+                    <span class="text-sm text-emerald-700">Get a flat 10% discount instantly on total purchases above ₹5,000!</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Workspace Split Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Left Column: Item Input Form Panel -->
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 h-fit">
+                <h2 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    ➕ Scan / Add Item
+                </h2>
+                
+                <form id="itemForm" class="space-y-4" novalidate>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Item Name</label>
+                        <input
+                            type="text"
+                            id="itemName"
+                            placeholder="e.g., Flour, Rice, Milk"
+                            class="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm transition"
+                        />
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Price (₹)</label>
+                            <input
+                                type="number"
+                                id="itemPrice"
+                                placeholder="0.00"
+                                step="0.01"
+                                class="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm transition"
+                            />
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Quantity</label>
+                            <input
+                                type="number"
+                                id="itemQuantity"
+                                value="1"
+                                min="1"
+                                class="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm transition"
+                            />
+                        </div>
+                    </div>
+
+                    <!-- Validation Error Notification Toast Area -->
+                    <div id="errorMsg" class="hidden p-3 bg-red-50 border border-red-200 text-xs rounded-lg text-red-600 font-semibold transition-all">
+                        <!-- Filled dynamically by JavaScript -->
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg text-sm shadow-md hover:shadow-lg transition cursor-pointer"
+                    >
+                        Add to Order
+                    </button>
+                </form>
+            </div>
+
+            <!-- Right Column: Cart Overview & Real-Time Invoice Breakdown -->
+            <div class="lg:col-span-2 space-y-6">
+                
+                <!-- Active Cart Summary Card -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col min-h-[250px] justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4 border-b pb-3 border-slate-100">
+                            <h2 class="text-lg font-bold text-slate-800">Current Order Summary</h2>
+                            <span id="cartCountBadge" class="bg-indigo-50 text-indigo-700 text-xs font-extrabold px-3 py-1 rounded-full border border-indigo-100">
+                                0 Items
+                            </span>
+                        </div>
+
+                        <!-- Empty State View -->
+                        <div id="emptyCartView" class="text-center py-12 border-2 border-dashed border-slate-100 rounded-xl">
+                            <p class="text-slate-400 text-sm">No items in the shopping cart. Scan or add items to begin billing.</p>
+                        </div>
+
+                        <!-- Dynamic Table List (Hidden until data exists) -->
+                        <div id="cartContentArea" class="hidden overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead>
+                                    <tr class="text-slate-400 text-xs uppercase tracking-wider border-b border-slate-100">
+                                        <th class="py-2 font-medium">Item Description</th>
+                                        <th class="py-2 text-right font-medium">Price</th>
+                                        <th class="py-2 text-center font-medium">Qty</th>
+                                        <th class="py-2 text-right font-medium">Total</th>
+                                        <th class="py-2 text-center font-medium">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cartTableBody" class="divide-y divide-slate-100 font-medium">
+                                    <!-- Rendered dynamically via js -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Invoice Breakdown Segment (Recalculates Automatically) -->
+                <div id="invoicePanel" class="hidden bg-slate-900 text-white rounded-2xl p-6 shadow-xl border border-slate-800">
+                    <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+                        <h3 class="text-xs font-bold uppercase text-slate-400 tracking-widest flex items-center gap-1.5">
+                            🧾 Detailed Invoice Breakdown
+                        </h3>
+                        <span id="timestamp" class="text-xs text-slate-500 font-mono"></span>
+                    </div>
+                    
+                    <div class="space-y-3 text-sm text-slate-300">
+                        <div class="flex justify-between">
+                            <span>Subtotal</span>
+                            <span id="invoiceSubtotal" class="font-mono">₹0.00</span>
+                        </div>
+                        
+                        <div id="invoiceDiscountRow" class="hidden flex justify-between text-emerald-400 font-semibold">
+                            <span>Discount Applied (10%)</span>
+                            <span id="invoiceDiscount" class="font-mono">-₹0.00</span>
+                        </div>
+                        
+                        <div class="flex justify-between">
+                            <span>Goods & Services Tax (GST 18%)</span>
+                            <span id="invoiceTax" class="font-mono">₹0.00</span>
+                        </div>
+                        
+                        <div class="border-t border-slate-800 pt-4 mt-2 flex justify-between text-white font-extrabold text-xl">
+                            <span>Total Amount Due</span>
+                            <span id="invoiceTotal" class="text-indigo-400 font-mono">₹0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- Script file renamed to script.js -->
+    <script src="script.js"></script>
+</body>
+</html>
